@@ -7,7 +7,16 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  tracing:
+    lambda: true
+    apiGateway: true
+    environment:
+      TODOS_TABLE: todos-${self:provider.stage}
+      TODOS_CREATED_AT_INDEX: todoCreatedAtIndex
+      BUCKET_NAME: todo-app-${self:provider.stage}
 
 functions:
 
@@ -21,6 +30,19 @@ functions:
       - http:
           method: get
           path: todos
+          cors: true
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action: "dynamodb:Query"
+        Resource:
+          - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
+          - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}"
+          - Effect: "Allow"
+            Action:
+              - "xray:PutTraceSegments"
+              - "xray:PutTelemetryRecords"
+            Resource: "*"
 
   # TODO: Configure this function
   CreateTodo:
