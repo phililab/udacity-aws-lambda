@@ -45,12 +45,27 @@ functions:
             Resource: "*"
 
   # TODO: Configure this function
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
-    events:
-      - http:
-          method: post
-          path: todos
+CreateTodo:
+  handler: src/lambda/http/createTodo.handler
+  events:
+    - http:
+        method: post
+        path: todos
+        cors: true
+        authorizer: Auth
+        request:
+          schemas:
+            application/json: ${file(src/validator/create-validator.json)}
+  iamRoleStatementsInherit: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action: "dynamodb:PutItem"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource: "*"
 
   # TODO: Configure this function
   UpdateTodo:
