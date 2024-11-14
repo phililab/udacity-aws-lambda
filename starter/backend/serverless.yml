@@ -1,4 +1,6 @@
+org: phililabs
 service: serverless-todo-app
+app: udacity-serverless
 
 plugins:
   - serverless-iam-roles-per-function
@@ -133,6 +135,7 @@ functions:
           - "*"
 
 resources:
+
   Resources:
     TodosTable:
       Type: AWS::DynamoDB::Table
