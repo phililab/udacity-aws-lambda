@@ -9,7 +9,7 @@ provider:
   name: aws
   runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  region: us-east-1
   tracing:
     lambda: true
     apiGateway: true
@@ -43,27 +43,27 @@ functions:
               - "xray:PutTelemetryRecords"
             Resource: "*"
 
-CreateTodo:
-  handler: src/lambda/http/createTodo.handler
-  events:
-    - http:
-        method: post
-        path: todos
-        cors: true
-        authorizer: Auth
-        request:
-          schemas:
-            application/json: ${file(src/validator/create-validator.json)}
-  iamRoleStatementsInherit: true
-  iamRoleStatements:
-    - Effect: Allow
-      Action: "dynamodb:PutItem"
-      Resource: "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
-    - Effect: "Allow"
-      Action:
-        - "xray:PutTraceSegments"
-        - "xray:PutTelemetryRecords"
-      Resource: "*"
+  CreateTodo:
+    handler: src/lambda/http/createTodo.handler
+    events:
+      - http:
+          method: post
+          path: todos
+          cors: true
+          authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(src/validator/create-validator.json)}
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action: "dynamodb:PutItem"
+        Resource: "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
+      - Effect: "Allow"
+        Action:
+          - "xray:PutTraceSegments"
+          - "xray:PutTelemetryRecords"
+        Resource: "*"
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
