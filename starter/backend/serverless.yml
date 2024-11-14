@@ -87,25 +87,25 @@ functions:
           - "xray:PutTelemetryRecords"
         Resource: "*"
 
-DeleteTodo:
-  handler: src/lambda/http/deleteTodo.handler
-  events:
-    - http:
-        method: delete
-        path: todos/{todoId}
-        cors: true
-        authorizer: Auth
-  iamRoleStatementsInherit: true
-  iamRoleStatements:
-    - Effect: Allow
-      Action: "dynamodb:DeleteItem"
-      Resource: "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
-    - Effect: "Allow"
-      Action:
-        - "xray:PutTraceSegments"
-        - "xray:PutTelemetryRecords"
-      Resource:
-        - "*"
+  DeleteTodo:
+    handler: src/lambda/http/deleteTodo.handler
+    events:
+      - http:
+          method: delete
+          path: todos/{todoId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action: "dynamodb:DeleteItem"
+        Resource: "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
+      - Effect: "Allow"
+        Action:
+          - "xray:PutTraceSegments"
+          - "xray:PutTelemetryRecords"
+        Resource:
+          - "*"
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
