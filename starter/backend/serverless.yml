@@ -16,7 +16,7 @@ provider:
   environment:
     TODOS_TABLE: todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: todoCreatedAtIndex
-    BUCKET_NAME: todo-app-${self:provider.stage}
+    BUCKET_NAME: todo-app:${aws:accountId}.${self:provider.stage}
 
 functions:
 
