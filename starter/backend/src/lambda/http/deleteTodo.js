@@ -12,7 +12,7 @@ const deleteTodoHandler = async (event) => {
     return {
         statusCode: 204,
         body: JSON.stringify({
-            message: "Delete successfully."
+            message: "Deleted successfully."
         })
     }
 }
