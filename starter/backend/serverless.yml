@@ -16,7 +16,7 @@ provider:
   environment:
     TODOS_TABLE: todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: todoCreatedAtIndex
-    BUCKET_NAME: todo-app:${aws:accountId}.${self:provider.stage}
+    BUCKET_NAME: todo-app-${aws:accountId}-${self:provider.stage}
 
 functions:
 
@@ -37,11 +37,11 @@ functions:
         Resource:
           - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}"
           - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}"
-          - Effect: "Allow"
-            Action:
-              - "xray:PutTraceSegments"
-              - "xray:PutTelemetryRecords"
-            Resource: "*"
+      - Effect: "Allow"
+        Action:
+          - "xray:PutTraceSegments"
+          - "xray:PutTelemetryRecords"
+        Resource: "*"
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
