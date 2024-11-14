@@ -5,8 +5,6 @@ app: udacity-serverless
 plugins:
   - serverless-iam-roles-per-function
 
-frameworkVersion: '3'
-
 provider:
   name: aws
   runtime: nodejs16.x
