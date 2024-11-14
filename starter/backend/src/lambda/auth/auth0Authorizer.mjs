@@ -4,7 +4,7 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('INFO')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-ymef3nb010c4irje.us.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {
