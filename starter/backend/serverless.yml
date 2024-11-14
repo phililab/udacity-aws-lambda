@@ -15,10 +15,10 @@ provider:
   tracing:
     lambda: true
     apiGateway: true
-    environment:
-      TODOS_TABLE: todos-${self:provider.stage}
-      TODOS_CREATED_AT_INDEX: todoCreatedAtIndex
-      BUCKET_NAME: todo-app-${self:provider.stage}
+  environment:
+    TODOS_TABLE: todos-${self:provider.stage}
+    TODOS_CREATED_AT_INDEX: todoCreatedAtIndex
+    BUCKET_NAME: todo-app-${self:provider.stage}
 
 functions:
 
