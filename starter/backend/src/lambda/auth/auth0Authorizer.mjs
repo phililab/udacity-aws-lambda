@@ -2,7 +2,7 @@ import Axios from 'axios'
 import jsonwebtoken from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger.mjs'
 
-const logger = createLogger('auth')
+const logger = createLogger('INFO')
 
 const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
 

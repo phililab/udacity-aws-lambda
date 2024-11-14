@@ -2,7 +2,7 @@ import * as uuid from 'uuid'
 import {createLogger} from '../utils/logger.mjs'
 import {todosAccess} from '../dataLayer/todosAccess.mjs'
 
-const logger = createLogger('CRUD Business Logic')
+const logger = createLogger('INFO')
 const bucketName = process.env.BUCKET_NAME
 
 // CREATE

@@ -4,7 +4,7 @@ import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import AWSXRay from 'aws-xray-sdk-core'
 import {getUploadUrl} from "../fileStorage/attachmentUtils.mjs"
 
-const logger = createLogger('DATA PROCESSING')
+const logger = createLogger('INFO')
 const todosTable = process.env.TODOS_TABLE
 const todosCreatedAtIndex = process.env.TODOS_CREATED_AT_INDEX
 const dbClient = AWSXRay.captureAWSv3Client(new DynamoDB())
@@ -89,6 +89,17 @@ export const todosAccess = {
             return "Deleted"
         } catch (error) {
             logger.error('Deletion failed')
+            throw new Error(error.message)
+        }
+    },
+    // UPLOAD IMAGE
+    async getUploadUrl(todoId) {
+        logger.info('Generate image url')
+
+        try {
+            return await getUploadUrl(todoId)
+        } catch (error) {
+            logger.error('Image upload failed')
             throw new Error(error.message)
         }
     }
