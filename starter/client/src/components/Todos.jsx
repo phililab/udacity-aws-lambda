@@ -17,62 +17,28 @@ import { deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import { NewTodoInput } from './NewTodoInput'
 
 export function Todos() {
-  function renderTodos() {
-    if (loadingTodos) {
-      return renderLoading()
+  const {user, getAccessTokenSilently} = useAuth0()
+  const [todos, setTodos] = useState([])
+  const [loadingTodos, setLoadingTodos] = useState(true)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    async function fetchTodos() {
+      try {
+        const accessToken = await getAccessTokenSilently({
+          audience: `https://dev-ymef3nb010c4irje.us.auth0.com/api/v2/`,
+          scope: 'read:todos'
+        })
+        const todos = await getTodos(accessToken)
+        setTodos(todos)
+        setLoadingTodos(false)
+      } catch (e) {
+        alert(`Failed to fetch todos: ${e.message}`)
+      }
     }
 
-    return renderTodosList()
-  }
-
-  function renderTodosList() {
-    return (
-      <Grid padded>
-        {todos.map((todo, pos) => {
-          return (
-            <Grid.Row key={todo.todoId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => onTodoCheck(pos)}
-                  checked={todo.done}
-                />
-              </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
-              </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {todo.dueDate}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => onEditButtonClick(todo.todoId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => onTodoDelete(todo.todoId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
-              )}
-              <Grid.Column width={16}>
-                <Divider />
-              </Grid.Column>
-            </Grid.Row>
-          )
-        })}
-      </Grid>
-    )
-  }
+    fetchTodos()
+  }, [getAccessTokenSilently])
 
   async function onTodoDelete(todoId) {
     try {
@@ -100,13 +66,13 @@ export function Todos() {
         done: !todo.done
       })
       setTodos(
-        update(todos, {
-          [pos]: { done: { $set: !todo.done } }
-        })
+          update(todos, {
+            [pos]: {done: {$set: !todo.done}}
+          })
       )
     } catch (e) {
       console.log('Failed to check a TODO', e)
-      alert('Todo deletion failed')
+      alert('Todo update failed')
     }
   }
 
@@ -114,51 +80,85 @@ export function Todos() {
     navigate(`/todos/${todoId}/edit`)
   }
 
-  const { user, getAccessTokenSilently } = useAuth0()
-  const [todos, setTodos] = useState([])
-  const [loadingTodos, setLoadingTodos] = useState(true)
-  const navigate = useNavigate()
-
-  console.log('User', {
-    name: user.name,
-    email: user.email
-  })
-
-  useEffect(() => {
-    async function foo() {
-      try {
-        const accessToken = await getAccessTokenSilently({
-          audience: `https://dev-ymef3nb010c4irje.us.auth0.com/api/v2/`,
-          scope: 'read:todos'
-        })
-        console.log('Access token: ' + accessToken)
-        const todos = await getTodos(accessToken)
-        setTodos(todos)
-        setLoadingTodos(false)
-      } catch (e) {
-        alert(`Failed to fetch todos: ${e.message}`)
-      }
+  function renderTodos() {
+    if (loadingTodos) {
+      return renderLoading()
     }
-    foo()
-  }, [getAccessTokenSilently])
+
+    return renderTodosList(todos, onTodoCheck, onTodoDelete, onEditButtonClick)
+  }
 
   return (
-    <div>
-      <Header as="h1">TODOs</Header>
+      <div>
+        <Header as="h1">TODOs</Header>
 
-      <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])} />
+        <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])}/>
 
-      {renderTodos(loadingTodos, todos)}
-    </div>
+        {renderTodos()}
+      </div>
   )
 }
 
 function renderLoading() {
   return (
-    <Grid.Row>
-      <Loader indeterminate active inline="centered">
-        Loading TODOs
-      </Loader>
-    </Grid.Row>
+      <Grid.Row>
+        <Loader indeterminate active inline="centered">
+          Loading TODOs
+        </Loader>
+      </Grid.Row>
+  )
+}
+
+function renderTodosList(todos, onTodoCheck, onTodoDelete, onEditButtonClick) {
+  return (
+      <Grid padded>
+        {todos.map((todo, pos) => (
+            <Grid.Row key={todo.todoId}>
+              <Grid.Column width={1} verticalAlign="middle">
+                <Checkbox
+                    onChange={() => onTodoCheck(pos)}
+                    checked={todo.done}
+                />
+              </Grid.Column>
+              <Grid.Column width={10} verticalAlign="middle">
+                {todo.name}
+              </Grid.Column>
+              <Grid.Column width={3} floated="right">
+                {todo.dueDate}
+              </Grid.Column>
+              <Grid.Column width={1} floated="right">
+                <Button
+                    icon
+                    color="blue"
+                    onClick={() => onEditButtonClick(todo.todoId)}
+                >
+                  <Icon name="pencil" />
+                </Button>
+              </Grid.Column>
+              <Grid.Column width={1} floated="right">
+                <Button
+                    icon
+                    color="red"
+                    onClick={() => onTodoDelete(todo.todoId)}
+                >
+                  <Icon name="delete" />
+                </Button>
+              </Grid.Column>
+              {todo.attachmentUrl && (
+                  <Grid.Column width={16}>
+                    <Image
+                        src={todo.attachmentUrl}
+                        size="small"
+                        wrapped
+                        onError={(e) => e.target.style.display = 'none'}
+                    />
+                  </Grid.Column>
+              )}
+              <Grid.Column width={16}>
+                <Divider />
+              </Grid.Column>
+            </Grid.Row>
+        ))}
+      </Grid>
   )
 }
